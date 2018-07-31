@@ -60,6 +60,7 @@ validParams<PorousFlowAqueousPreDisChemistry>()
   params.addParam<std::vector<Real>>("eta_exponent",
                                      "Eta exponent.  Defaults to 1.  (one for each reaction)");
   params.addPrivateParam<std::string>("pf_material_type", "chemistry");
+  params.addParam<std::string>("base_name", "Material property base name");
   params.addClassDescription("This Material forms a std::vector of mineralisation reaction rates "
                              "(L(precipitate)/L(solution)/s) appropriate to the aqueous "
                              "precipitation-dissolution system provided.  Note: the "
@@ -70,6 +71,7 @@ validParams<PorousFlowAqueousPreDisChemistry>()
 PorousFlowAqueousPreDisChemistry::PorousFlowAqueousPreDisChemistry(
     const InputParameters & parameters)
   : PorousFlowMaterialVectorBase(parameters),
+    _base_name(isParamValid("base_name") ? getParam<std::string>("base_name") + "_" : ""),
     _porosity_old(_nodal_material ? getMaterialPropertyOld<Real>("PorousFlow_porosity_nodal")
                                   : getMaterialPropertyOld<Real>("PorousFlow_porosity_qp")),
     _aq_ph(_dictator.aqueousPhaseNumber()),
@@ -77,12 +79,12 @@ PorousFlowAqueousPreDisChemistry::PorousFlowAqueousPreDisChemistry(
                     ? getMaterialProperty<std::vector<Real>>("PorousFlow_saturation_nodal")
                     : getMaterialProperty<std::vector<Real>>("PorousFlow_saturation_qp")),
 
-    _temperature(_nodal_material ? getMaterialProperty<Real>("PorousFlow_temperature_nodal")
-                                 : getMaterialProperty<Real>("PorousFlow_temperature_qp")),
+    _temperature(_nodal_material ? getMaterialProperty<Real>(_base_name + "PorousFlow_temperature_nodal")
+                                 : getMaterialProperty<Real>(_base_name + "PorousFlow_temperature_qp")),
     _dtemperature_dvar(
         _nodal_material
-            ? getMaterialProperty<std::vector<Real>>("dPorousFlow_temperature_nodal_dvar")
-            : getMaterialProperty<std::vector<Real>>("dPorousFlow_temperature_qp_dvar")),
+            ? getMaterialProperty<std::vector<Real>>(_base_name + "dPorousFlow_temperature_nodal_dvar")
+            : getMaterialProperty<std::vector<Real>>(_base_name + "dPorousFlow_temperature_qp_dvar")),
 
     _num_primary(coupledComponents("primary_concentrations")),
     _num_reactions(getParam<unsigned>("num_reactions")),

@@ -32,6 +32,8 @@ public:
 protected:
   virtual Real computeValue() override;
 
+  std::string _base_name;
+
 private:
   /// Pressure of each phase
   const MaterialProperty<std::vector<Real>> * _pressure;

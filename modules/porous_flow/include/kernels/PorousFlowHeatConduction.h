@@ -31,6 +31,8 @@ protected:
   virtual Real computeQpJacobian() override;
   virtual Real computeQpOffDiagJacobian(unsigned int jvar) override;
 
+  std::string _base_name;
+
   /// PorousFlowDictator UserObject
   const PorousFlowDictator & _dictator;
 

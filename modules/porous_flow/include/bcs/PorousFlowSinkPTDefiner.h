@@ -28,6 +28,9 @@ public:
   PorousFlowSinkPTDefiner(const InputParameters & parameters);
 
 protected:
+  
+  std::string _base_name;
+
   /// Nodal pore pressure in each phase
   const MaterialProperty<std::vector<Real>> * const _pp;
 

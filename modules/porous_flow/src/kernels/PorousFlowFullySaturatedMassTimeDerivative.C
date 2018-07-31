@@ -34,6 +34,7 @@ validParams<PorousFlowFullySaturatedMassTimeDerivative>()
                         "fluid volume (which is common in poro-mechanics)");
   params.addRequiredParam<UserObjectName>(
       "PorousFlowDictator", "The UserObject that holds the list of PorousFlow variable names.");
+  params.addParam<std::string>("base_name","Material property base name");
   params.addClassDescription("Fully-saturated version of the single-component, single-phase fluid "
                              "mass derivative wrt time");
   return params;
@@ -42,6 +43,7 @@ validParams<PorousFlowFullySaturatedMassTimeDerivative>()
 PorousFlowFullySaturatedMassTimeDerivative::PorousFlowFullySaturatedMassTimeDerivative(
     const InputParameters & parameters)
   : TimeKernel(parameters),
+    _base_name(isParamValid("base_name") ? getParam<std::string>("base_name") + "_" : "" ),
     _dictator(getUserObject<PorousFlowDictator>("PorousFlowDictator")),
     _var_is_porflow_var(_dictator.isPorousFlowVariable(_var.number())),
     _multiply_by_density(getParam<bool>("multiply_by_density")),
@@ -66,12 +68,12 @@ PorousFlowFullySaturatedMassTimeDerivative::PorousFlowFullySaturatedMassTimeDeri
     _pp_old(getMaterialPropertyOld<std::vector<Real>>("PorousFlow_porepressure_qp")),
     _dpp_dvar(
         getMaterialProperty<std::vector<std::vector<Real>>>("dPorousFlow_porepressure_qp_dvar")),
-    _temperature(_includes_thermal ? &getMaterialProperty<Real>("PorousFlow_temperature_qp")
+    _temperature(_includes_thermal ? &getMaterialProperty<Real>(_base_name + "PorousFlow_temperature_qp")
                                    : nullptr),
-    _temperature_old(_includes_thermal ? &getMaterialPropertyOld<Real>("PorousFlow_temperature_qp")
+    _temperature_old(_includes_thermal ? &getMaterialPropertyOld<Real>(_base_name + "PorousFlow_temperature_qp")
                                        : nullptr),
     _dtemperature_dvar(_includes_thermal ? &getMaterialProperty<std::vector<Real>>(
-                                               "dPorousFlow_temperature_qp_dvar")
+                                               _base_name + "dPorousFlow_temperature_qp_dvar")
                                          : nullptr),
     _strain_rate(_includes_mechanical
                      ? &getMaterialProperty<Real>("PorousFlow_volumetric_strain_rate_qp")

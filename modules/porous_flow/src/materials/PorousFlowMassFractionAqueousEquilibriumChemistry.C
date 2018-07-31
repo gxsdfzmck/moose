@@ -53,6 +53,7 @@ validParams<PorousFlowMassFractionAqueousEquilibriumChemistry>()
       "secondary_activity_coefficients",
       "Activity coefficients for the secondary species (dimensionless) (one for each reaction)");
   params.addPrivateParam<std::string>("pf_material_type", "mass_fraction");
+  params.addParam<std::string>("base_name", "Material property base name");
   params.addClassDescription(
       "This Material forms a std::vector<std::vector ...> of mass-fractions "
       "(total concentrations of primary species (m^{3}(primary species)/m^{3}(solution)) and since "
@@ -67,6 +68,7 @@ validParams<PorousFlowMassFractionAqueousEquilibriumChemistry>()
 PorousFlowMassFractionAqueousEquilibriumChemistry::
     PorousFlowMassFractionAqueousEquilibriumChemistry(const InputParameters & parameters)
   : PorousFlowMassFraction(parameters),
+    _base_name(isParamValid("base_name") ? getParam<std::string>("base_name") + "_" : ""),
     _sec_conc(_nodal_material
                   ? declareProperty<std::vector<Real>>("PorousFlow_secondary_concentration_nodal")
                   : declareProperty<std::vector<Real>>("PorousFlow_secondary_concentration_qp")),
@@ -75,12 +77,12 @@ PorousFlowMassFractionAqueousEquilibriumChemistry::
                                     : declareProperty<std::vector<std::vector<Real>>>(
                                           "dPorousFlow_secondary_concentration_qp_dvar")),
 
-    _temperature(_nodal_material ? getMaterialProperty<Real>("PorousFlow_temperature_nodal")
-                                 : getMaterialProperty<Real>("PorousFlow_temperature_qp")),
+    _temperature(_nodal_material ? getMaterialProperty<Real>(_base_name + "PorousFlow_temperature_nodal")
+                                 : getMaterialProperty<Real>(_base_name + "PorousFlow_temperature_qp")),
     _dtemperature_dvar(
         _nodal_material
-            ? getMaterialProperty<std::vector<Real>>("dPorousFlow_temperature_nodal_dvar")
-            : getMaterialProperty<std::vector<Real>>("dPorousFlow_temperature_qp_dvar")),
+            ? getMaterialProperty<std::vector<Real>>(_base_name + "dPorousFlow_temperature_nodal_dvar")
+            : getMaterialProperty<std::vector<Real>>(_base_name + "dPorousFlow_temperature_qp_dvar")),
 
     _num_primary(_num_components - 1),
     _aq_ph(_dictator.aqueousPhaseNumber()),

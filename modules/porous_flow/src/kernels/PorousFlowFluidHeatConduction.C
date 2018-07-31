@@ -12,7 +12,7 @@ validParams<PorousFlowFluidHeatConduction>()
 {
   InputParameters params = validParams<Kernel>();
   params.addRequiredParam<UserObjectName>("PorousFlowDictator", "the UserObject that holds the list of PorousFlow variable names");
-  params.addRequiredParam<std::string>("base_name", "equilibrium", "Material property base name");
+  params.addParam<std::string>("base_name", "Material property base name");
   params.addClassDescription("Fluid heat conduction in the porous Flow module");
   return params;
 }

@@ -68,6 +68,8 @@ protected:
 
   Real rateConstantQp(unsigned reaction_num) const;
 
+  std::string _base_name;
+
   /// Old values of the porosity
   const MaterialProperty<Real> & _porosity_old;
 

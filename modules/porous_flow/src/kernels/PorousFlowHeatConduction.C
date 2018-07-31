@@ -20,21 +20,23 @@ validParams<PorousFlowHeatConduction>()
   InputParameters params = validParams<Kernel>();
   params.addRequiredParam<UserObjectName>(
       "PorousFlowDictator", "The UserObject that holds the list of PorousFlow variable names");
+  params.addParam<std::string>("base_name", "Material property base name");
   params.addClassDescription("Heat conduction in the Porous Flow module");
   return params;
 }
 
 PorousFlowHeatConduction::PorousFlowHeatConduction(const InputParameters & parameters)
   : Kernel(parameters),
+    _base_name(isParamValid("base_name") ? getParam<std::string>("base_name") + "_" : ""),
     _dictator(getUserObject<PorousFlowDictator>("PorousFlowDictator")),
     _la(getMaterialProperty<RealTensorValue>("PorousFlow_thermal_conductivity_qp")),
     _dla_dvar(getMaterialProperty<std::vector<RealTensorValue>>(
         "dPorousFlow_thermal_conductivity_qp_dvar")),
-    _grad_t(getMaterialProperty<RealGradient>("PorousFlow_grad_temperature_qp")),
+    _grad_t(getMaterialProperty<RealGradient>(_base_name + "PorousFlow_grad_temperature_qp")),
     _dgrad_t_dvar(
-        getMaterialProperty<std::vector<RealGradient>>("dPorousFlow_grad_temperature_qp_dvar")),
+        getMaterialProperty<std::vector<RealGradient>>(_base_name + "dPorousFlow_grad_temperature_qp_dvar")),
     _dgrad_t_dgradvar(
-        getMaterialProperty<std::vector<Real>>("dPorousFlow_grad_temperature_qp_dgradvar"))
+        getMaterialProperty<std::vector<Real>>(_base_name + "dPorousFlow_grad_temperature_qp_dgradvar"))
 {
 }
 

@@ -32,6 +32,8 @@ protected:
   virtual void initQpStatefulProperties() override;
   virtual void computeQpProperties() override;
 
+  std::string _base_name;
+
   /**
    * The stoichiometric coefficient
    * @param reaction_num Reaction number (0, ..., _num_reactions - 1)

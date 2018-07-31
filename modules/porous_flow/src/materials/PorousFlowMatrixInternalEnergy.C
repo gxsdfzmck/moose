@@ -21,6 +21,7 @@ validParams<PorousFlowMatrixInternalEnergy>()
   params.addRequiredParam<Real>("density", "Density of the rock grains");
   params.set<bool>("at_nodes") = true;
   params.addPrivateParam<std::string>("pf_material_type", "matrix_internal_energy");
+  params.addParam<std::string>("base_name", "Material property base name");
   params.addClassDescription("This Material calculates the internal energy of solid rock grains, "
                              "which is specific_heat_capacity * density * temperature.  Kernels "
                              "multiply this by (1 - porosity) to find the energy density of the "
@@ -30,12 +31,13 @@ validParams<PorousFlowMatrixInternalEnergy>()
 
 PorousFlowMatrixInternalEnergy::PorousFlowMatrixInternalEnergy(const InputParameters & parameters)
   : PorousFlowMaterialVectorBase(parameters),
+    _base_name(isParamValid("base_name") ? getParam<std::string>("base_name") + "_" : ""),
     _cp(getParam<Real>("specific_heat_capacity")),
     _density(getParam<Real>("density")),
     _heat_cap(_cp * _density),
-    _temperature_nodal(getMaterialProperty<Real>("PorousFlow_temperature_nodal")),
+    _temperature_nodal(getMaterialProperty<Real>(_base_name + "PorousFlow_temperature_nodal")),
     _dtemperature_nodal_dvar(
-        getMaterialProperty<std::vector<Real>>("dPorousFlow_temperature_nodal_dvar")),
+        getMaterialProperty<std::vector<Real>>(_base_name + "dPorousFlow_temperature_nodal_dvar")),
     _en_nodal(declareProperty<Real>("PorousFlow_matrix_internal_energy_nodal")),
     _den_nodal_dvar(
         declareProperty<std::vector<Real>>("dPorousFlow_matrix_internal_energy_nodal_dvar"))

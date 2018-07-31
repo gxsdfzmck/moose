@@ -32,6 +32,8 @@ protected:
   virtual Real computeQpJacobian() override;
   virtual Real computeQpOffDiagJacobian(unsigned int jvar) override;
 
+  std::string _base_name;
+
   /// Add Dirac Points to the borehole
   virtual void addPoints() override;
 

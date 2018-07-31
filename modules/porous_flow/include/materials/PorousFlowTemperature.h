@@ -29,6 +29,8 @@ public:
 protected:
   virtual void initQpStatefulProperties() override;
   virtual void computeQpProperties() override;
+  
+  std::string _base_name;
 
   /// Number of PorousFlow variables
   const unsigned int _num_pf_vars;

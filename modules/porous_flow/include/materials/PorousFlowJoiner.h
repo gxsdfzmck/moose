@@ -43,6 +43,8 @@ protected:
   virtual void initQpStatefulProperties() override;
   virtual void computeQpProperties() override;
 
+  std::string _base_name;
+
   /// Name of material property to be joined
   const std::string _pf_prop;
 

@@ -28,6 +28,7 @@ validParams<PorousFlowPropertyAux>()
       "fluid_component", 0, "The index of the fluid component this auxillary kernel acts on");
   params.addParam<unsigned int>("secondary_species", 0, "The secondary chemical species number");
   params.addParam<unsigned int>("mineral_species", 0, "The mineral chemical species number");
+  params.addParam<std::string>("base_name", "Material property base name");
   params.addClassDescription("AuxKernel to provide access to properties evaluated at quadpoints. "
                              "Note that elemental AuxVariables must be used, so that these "
                              "properties are integrated over each element.");
@@ -36,6 +37,7 @@ validParams<PorousFlowPropertyAux>()
 
 PorousFlowPropertyAux::PorousFlowPropertyAux(const InputParameters & parameters)
   : AuxKernel(parameters),
+    _base_name(isParamValid("base_name") ? getParam<std::string>("base_name") + "_" : ""),
     _dictator(getUserObject<PorousFlowDictator>("PorousFlowDictator")),
     _property_enum(getParam<MooseEnum>("property").getEnum<PropertyEnum>()),
     _phase(getParam<unsigned int>("phase")),
@@ -80,7 +82,7 @@ PorousFlowPropertyAux::PorousFlowPropertyAux(const InputParameters & parameters)
       break;
 
     case PropertyEnum::TEMPERATURE:
-      _temperature = &getMaterialProperty<Real>("PorousFlow_temperature_qp");
+      _temperature = &getMaterialProperty<Real>(_base_name + "PorousFlow_temperature_qp");
       break;
 
     case PropertyEnum::DENSITY:

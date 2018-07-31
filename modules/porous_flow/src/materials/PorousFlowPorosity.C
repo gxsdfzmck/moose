@@ -53,13 +53,14 @@ validParams<PorousFlowPorosity>()
                                      "When chemical=true, porosity is a linear combination of the "
                                      "solid mineral concentrations multiplied by these weights.  "
                                      "Default=1 for all minerals.");
+  params.addParam<std::string>("base_name", "Material property base name");
   params.addClassDescription("This Material calculates the porosity PorousFlow simulations");
   return params;
 }
 
 PorousFlowPorosity::PorousFlowPorosity(const InputParameters & parameters)
   : PorousFlowPorosityExponentialBase(parameters),
-
+    _base_name(isParamValid("base_name") ? getParam<std::string>("base_name") + "_" : ""),
     _mechanical(getParam<bool>("mechanical")),
     _fluid(getParam<bool>("fluid")),
     _thermal(getParam<bool>("thermal")),
@@ -102,14 +103,14 @@ PorousFlowPorosity::PorousFlowPorosity(const InputParameters & parameters)
                      : nullptr),
 
     _temperature(_thermal
-                     ? (_nodal_material ? &getMaterialProperty<Real>("PorousFlow_temperature_nodal")
-                                        : &getMaterialProperty<Real>("PorousFlow_temperature_qp"))
+                     ? (_nodal_material ? &getMaterialProperty<Real>(_base_name + "PorousFlow_temperature_nodal")
+                                        : &getMaterialProperty<Real>(_base_name + "PorousFlow_temperature_qp"))
                      : nullptr),
     _dtemperature_dvar(
         _thermal
             ? (_nodal_material
-                   ? &getMaterialProperty<std::vector<Real>>("dPorousFlow_temperature_nodal_dvar")
-                   : &getMaterialProperty<std::vector<Real>>("dPorousFlow_temperature_qp_dvar"))
+                   ? &getMaterialProperty<std::vector<Real>>(_base_name + "dPorousFlow_temperature_nodal_dvar")
+                   : &getMaterialProperty<std::vector<Real>>(_base_name + "dPorousFlow_temperature_qp_dvar"))
             : nullptr),
 
     _mineral_conc_old(_chemical ? (_nodal_material ? &getMaterialPropertyOld<std::vector<Real>>(

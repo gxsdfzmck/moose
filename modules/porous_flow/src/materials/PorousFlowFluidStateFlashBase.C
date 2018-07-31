@@ -32,7 +32,6 @@ validParams<PorousFlowFluidStateFlashBase>()
 
 PorousFlowFluidStateFlashBase::PorousFlowFluidStateFlashBase(const InputParameters & parameters)
   : PorousFlowVariableBase(parameters),
-
     _gas_porepressure(_nodal_material ? coupledNodalValue("gas_porepressure")
                                       : coupledValue("gas_porepressure")),
     _gas_gradp_qp(coupledGradient("gas_porepressure")),
@@ -49,13 +48,13 @@ PorousFlowFluidStateFlashBase::PorousFlowFluidStateFlashBase(const InputParamete
     _aqueous_fluid_component(_fs_base.aqueousComponentIndex()),
     _gas_fluid_component(_fs_base.gasComponentIndex()),
 
-    _temperature(_nodal_material ? getMaterialProperty<Real>("PorousFlow_temperature_nodal")
-                                 : getMaterialProperty<Real>("PorousFlow_temperature_qp")),
-    _gradT_qp(getMaterialProperty<RealGradient>("PorousFlow_grad_temperature_qp")),
+    _temperature(_nodal_material ? getMaterialProperty<Real>("fluid_PorousFlow_temperature_nodal")
+                                 : getMaterialProperty<Real>("fluid_PorousFlow_temperature_qp")),
+    _gradT_qp(getMaterialProperty<RealGradient>("fluid_PorousFlow_grad_temperature_qp")),
     _dtemperature_dvar(
         _nodal_material
-            ? getMaterialProperty<std::vector<Real>>("dPorousFlow_temperature_nodal_dvar")
-            : getMaterialProperty<std::vector<Real>>("dPorousFlow_temperature_qp_dvar")),
+            ? getMaterialProperty<std::vector<Real>>("fluid_dPorousFlow_temperature_nodal_dvar")
+            : getMaterialProperty<std::vector<Real>>("fluid_dPorousFlow_temperature_qp_dvar")),
 
     _mass_frac(_nodal_material
                    ? declareProperty<std::vector<std::vector<Real>>>("PorousFlow_mass_frac_nodal")

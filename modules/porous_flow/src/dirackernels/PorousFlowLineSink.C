@@ -45,6 +45,7 @@ validParams<PorousFlowLineSink>()
   params.addParam<bool>("use_enthalpy", false, "Multiply the flux by the fluid enthalpy");
   params.addParam<bool>(
       "use_internal_energy", false, "Multiply the flux by the fluid internal energy");
+  params.addParam<std::string>("base_name", "Material property base name");
   params.addClassDescription("Approximates a line sink in the mesh by a sequence of weighted Dirac "
                              "points whose positions are read from a file");
   return params;
@@ -52,6 +53,7 @@ validParams<PorousFlowLineSink>()
 
 PorousFlowLineSink::PorousFlowLineSink(const InputParameters & parameters)
   : PorousFlowLineGeometry(parameters),
+    _base_name(isParamValid("base_name") ? getParam<std::string>("base_name") + "_" : "" ),
     _dictator(getUserObject<PorousFlowDictator>("PorousFlowDictator")),
     _total_outflow_mass(
         const_cast<PorousFlowSumQuantity &>(getUserObject<PorousFlowSumQuantity>("SumQuantityUO"))),
@@ -59,8 +61,8 @@ PorousFlowLineSink::PorousFlowLineSink(const InputParameters & parameters)
     _has_porepressure(
         hasMaterialProperty<std::vector<Real>>("PorousFlow_porepressure_qp") &&
         hasMaterialProperty<std::vector<std::vector<Real>>>("dPorousFlow_porepressure_qp_dvar")),
-    _has_temperature(hasMaterialProperty<Real>("PorousFlow_temperature_qp") &&
-                     hasMaterialProperty<std::vector<Real>>("dPorousFlow_temperature_qp_dvar")),
+    _has_temperature(hasMaterialProperty<Real>(_base_name + "PorousFlow_temperature_qp") &&
+                     hasMaterialProperty<std::vector<Real>>(_base_name + "dPorousFlow_temperature_qp_dvar")),
     _has_mass_fraction(
         hasMaterialProperty<std::vector<std::vector<Real>>>("PorousFlow_mass_frac_nodal") &&
         hasMaterialProperty<std::vector<std::vector<std::vector<Real>>>>(
@@ -101,14 +103,14 @@ PorousFlowLineSink::PorousFlowLineSink(const InputParameters & parameters)
             : nullptr),
     _dpp_dvar((_p_or_t == PorTchoice::pressure && _has_porepressure)
                   ? &getMaterialProperty<std::vector<std::vector<Real>>>(
-                        "dPorousFlow_porepressure_qp_dvar")
+                        _base_name + "dPorousFlow_porepressure_qp_dvar")
                   : nullptr),
     _temperature((_p_or_t == PorTchoice::temperature && _has_temperature)
-                     ? &getMaterialProperty<Real>("PorousFlow_temperature_qp")
+                     ? &getMaterialProperty<Real>(_base_name + "PorousFlow_temperature_qp")
                      : nullptr),
     _dtemperature_dvar(
         (_p_or_t == PorTchoice::temperature && _has_temperature)
-            ? &getMaterialProperty<std::vector<Real>>("dPorousFlow_temperature_qp_dvar")
+            ? &getMaterialProperty<std::vector<Real>>(_base_name + "dPorousFlow_temperature_qp_dvar")
             : nullptr),
     _fluid_density_node(
         (_use_mobility && _has_mobility)

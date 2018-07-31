@@ -33,6 +33,8 @@ protected:
   virtual void initQpStatefulProperties() override;
   virtual void computeQpProperties() override;
 
+  std::string _base_name;
+
   /// Specific heat capacity of rock grains
   const Real _cp;
 

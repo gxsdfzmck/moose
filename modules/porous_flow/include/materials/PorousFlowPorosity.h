@@ -36,7 +36,9 @@ protected:
   virtual Real decayQp() const override;
   virtual Real ddecayQp_dvar(unsigned pvar) const override;
   virtual RealGradient ddecayQp_dgradvar(unsigned pvar) const override;
-
+ 
+  std::string _base_name;
+   
   /// Porosity is a function of volumetric strain
   const bool _mechanical;
 
